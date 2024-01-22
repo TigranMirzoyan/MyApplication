@@ -1,0 +1,10 @@
+<!-- res/drawable/layer_list_button.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Oval Shape -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/red" />
+        </shape>
+    </item>
+</layer-list>
