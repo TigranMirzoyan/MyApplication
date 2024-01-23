@@ -39,9 +39,10 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
 
-                // удалить все маркеры
                 Button button1 = view.findViewById(R.id.button1);
                 Button button3 = view.findViewById(R.id.button3);
+
+                // удалить все маркеры
                 button1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -49,7 +50,7 @@ public class MapFragment extends Fragment {
                     }
                 });
 
-
+                //добавить маркер
                 button3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
