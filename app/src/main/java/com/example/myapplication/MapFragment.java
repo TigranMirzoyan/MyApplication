@@ -50,7 +50,7 @@ public class MapFragment extends Fragment {
                     }
                 });
 
-                //добавить маркер
+                // добавить маркер
                 button3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
