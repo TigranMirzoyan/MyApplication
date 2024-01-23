@@ -38,35 +38,52 @@ public class MapFragment extends Fragment {
 
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
-                // когда карта загружена
-                googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+                // удалить все маркеры
+                Button button1 = view.findViewById(R.id.button1);
+                Button button3 = view.findViewById(R.id.button3);
+                button1.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onMapClick(@NonNull LatLng latLng) {
-                        // при нажатии на карту инициализируются параметры маркера
-                        MarkerOptions markerOptions = new MarkerOptions();
-
-                        // установить положение маркера
-                        markerOptions.position(latLng);
-
-                        // установить название маркера
-                        markerOptions.title(latLng.latitude + ":" + latLng.longitude);
-
-                        // удалить все маркеры
-                        Button button = view.findViewById(R.id.button1);
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                googleMap.clear();
-                            }
-                        });
-
-                        // анимация масштабирования маркера
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-
-                        // добавить маркер на карту
-                        googleMap.addMarker(markerOptions);
+                    public void onClick(View v) {
+                        googleMap.clear();
                     }
                 });
+
+
+                button3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // когда карта загружена
+                        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                            @Override
+                            public void onMapClick(@NonNull LatLng latLng) {
+                                // при нажатии на карту инициализируются параметры маркера
+                                MarkerOptions markerOptions = new MarkerOptions();
+
+                                // установить положение маркера
+                                markerOptions.position(latLng);
+
+                                // установить название маркера
+                                markerOptions.title(latLng.latitude + ":" + latLng.longitude);
+
+                                // анимация масштабирования маркера
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
+                                // добавить маркер на карту
+                                googleMap.addMarker(markerOptions);
+
+                                // убрать обработчик события после добавления маркера
+                                googleMap.setOnMapClickListener(null);
+                            }
+                        });
+                    }
+                });
+
+                // увеличить и уменьшить
+                googleMap.getUiSettings().setZoomControlsEnabled(true);
+                googleMap.getUiSettings().setCompassEnabled(true);
+
+
             }
         });
         return view;

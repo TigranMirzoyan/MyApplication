@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         // менять фрагменты
         smoothBottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override

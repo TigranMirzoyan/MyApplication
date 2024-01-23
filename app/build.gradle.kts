@@ -39,4 +39,5 @@ dependencies {
     implementation("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
 }
