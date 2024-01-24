@@ -53,27 +53,28 @@ public class MapFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 String location = searchView.getQuery().toString();
                 List<Address> addressList = null;
 
                 if (location != null && !location.equals("")) {
-                    Geocoder geocoder = new Geocoder(requireContext()); // Use requireContext() to get the context
+                    Geocoder geocoder = new Geocoder(requireContext());
 
                     try {
-                        addressList = geocoder.getFromLocationName(location, 1); // Limit the number of results to 1
+                        addressList = geocoder.getFromLocationName(location, 1);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    Address address = addressList.get(0);
-
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-
+                    if (addressList != null && !addressList.isEmpty()) {
+                        Address address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    } else {
+                    }
                 }
                 return false;
             }
+
 
             @Override
             public boolean onQueryTextChange(String newText) {
