@@ -72,6 +72,7 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/searchview"
             android:text=""
+            android:gravity="center"
             android:textColor="@color/black"
             android:textSize="30dp" />
 
