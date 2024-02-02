@@ -22,10 +22,11 @@
         android:layout_marginRight="20dp"
         android:background="@drawable/searchview" />
 
+
     <LinearLayout
         android:id="@+id/linear1"
         android:layout_width="60dp"
-        android:layout_height="230dp"
+        android:layout_height="150dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="5dp"
@@ -37,15 +38,6 @@
             android:layout_height="60dp"
             android:background="@drawable/deleteb"
             android:drawableEnd="@drawable/a_delete"
-            android:gravity="center"
-            android:paddingRight="10dp" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/deleteb"
             android:gravity="center"
             android:paddingRight="10dp" />
 

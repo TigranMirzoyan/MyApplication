@@ -30,8 +30,6 @@ import java.util.List;
 public class MapFragment extends Fragment {
 
     private GoogleMap googleMap;
-    private List<Marker> markerList = new ArrayList<>();
-
     private SearchView searchView;
 
     @SuppressLint("MissingInflatedId")
@@ -89,7 +87,6 @@ public class MapFragment extends Fragment {
                 googleMap = map;
 
                 Button button1 = view.findViewById(R.id.button1);
-                Button button2 = view.findViewById(R.id.button2);
                 Button button3 = view.findViewById(R.id.button3);
 
                 // удалить все маркеры
@@ -97,14 +94,6 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         clearMarkers();
-                    }
-                });
-
-                // удалить последний маркеры
-                button2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        deleteLastMarker();
                     }
                 });
 
@@ -123,14 +112,6 @@ public class MapFragment extends Fragment {
 
     private void clearMarkers() {
         googleMap.clear();
-        markerList.clear();
-    }
-
-    private void deleteLastMarker() {
-        if (!markerList.isEmpty()) {
-            Marker lastMarker = markerList.remove(markerList.size() - 1);
-            lastMarker.remove();
-        }
     }
 
     private void addMarker() {
@@ -143,9 +124,7 @@ public class MapFragment extends Fragment {
                             .title(latLng.latitude + ":" + latLng.longitude);
 
                     Marker marker = googleMap.addMarker(markerOptions);
-                    markerList.add(marker);
 
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
                     googleMap.setOnMapClickListener(null);
                 }
             });
