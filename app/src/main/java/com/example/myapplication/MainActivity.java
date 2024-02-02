@@ -1,10 +1,15 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
-import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.myapplication.HomeFragment;
+import com.example.myapplication.MapFragment;
+import com.example.myapplication.MessengerFragment;
+import com.example.myapplication.ProfileFragment;
+import com.example.myapplication.R;
 
 import me.ibrahimsn.lib.OnItemSelectedListener;
 import me.ibrahimsn.lib.SmoothBottomBar;
@@ -19,8 +24,11 @@ public class MainActivity extends AppCompatActivity {
 
         smoothBottomBar = findViewById(R.id.bottombar);
 
-
-
+        // Отображаем HomeFragment при запуске приложения
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.framelayout, new HomeFragment());
+        fragmentTransaction.commit();
 
         // менять фрагменты
         smoothBottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {

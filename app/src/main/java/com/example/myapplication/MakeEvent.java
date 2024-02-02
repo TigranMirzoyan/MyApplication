@@ -55,6 +55,7 @@ public class MakeEvent extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack();
             }
         });
+
         buttonMinus.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
