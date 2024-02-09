@@ -25,7 +25,7 @@
 
     <LinearLayout
         android:id="@+id/linear1"
-        android:layout_width="60dp"
+        android:layout_width="70dp"
         android:layout_height="150dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
@@ -34,21 +34,22 @@
 
         <Button
             android:id="@+id/button1"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:background="@drawable/deleteb"
-            android:drawableEnd="@drawable/a_delete"
-            android:gravity="center"
-            android:paddingRight="10dp" />
+            android:drawableTop="@drawable/a_delete"
+            android:gravity="center_horizontal"
+            android:paddingTop="12dp"
+            android:layout_gravity="center"/>
 
         <Button
             android:id="@+id/button3"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/makem"
             android:text="+"
-            android:textSize="50dp" />
+            android:textSize="50dp"
+            android:layout_gravity="center"/>
     </LinearLayout>
 </RelativeLayout>
