@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.annotation.SuppressLint;
+import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,6 +33,13 @@ public class MapFragment extends Fragment {
 
     private GoogleMap googleMap;
     private SearchView searchView;
+
+    Button dmbutton;
+    private int buttonVisBool = 0;
+
+
+
+    Marker clickedMarker = null;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -86,25 +95,54 @@ public class MapFragment extends Fragment {
             public void onMapReady(@NonNull GoogleMap map) {
                 googleMap = map;
 
-                Button button1 = view.findViewById(R.id.button1);
-                Button button3 = view.findViewById(R.id.button3);
+                Button deleteButton = view.findViewById(R.id.button1);
+                Button addButton = view.findViewById(R.id.button2);
+                deleteButton.setVisibility(View.INVISIBLE);
 
-                // удалить все маркеры
-                button1.setOnClickListener(new View.OnClickListener() {
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        clearMarkers();
+                    public boolean onMarkerClick(Marker marker) {
+                        if (clickedMarker == null || !clickedMarker.equals(marker)) {
+                            deleteButton.setVisibility(View.VISIBLE);
+
+                            // Get the screen coordinates of the marker
+                            Point markerPoint = googleMap.getProjection().toScreenLocation(marker.getPosition());
+
+                            // Adjust the position of the button to be above the marker
+                            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) deleteButton.getLayoutParams();
+                            layoutParams.leftMargin = markerPoint.x - (deleteButton.getWidth() / 2);
+                            layoutParams.topMargin = markerPoint.y - deleteButton.getHeight() - 95;
+                            deleteButton.setLayoutParams(layoutParams);
+
+                            clickedMarker = marker;
+                        } else {
+                            deleteButton.setVisibility(View.INVISIBLE);
+                            clickedMarker = null;
+                        }
+                        return true;
                     }
                 });
 
-                // добавить маркер
-                button3.setOnClickListener(new View.OnClickListener() {
+
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (clickedMarker != null) {
+                            clickedMarker.remove();
+                            deleteButton.setVisibility(View.INVISIBLE);
+                            clickedMarker = null;
+                        }
+                    }
+                });
+
+                addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         addMarker();
                     }
                 });
             }
+
         });
 
         return view;

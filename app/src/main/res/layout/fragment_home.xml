@@ -15,8 +15,8 @@
         android:background="@drawable/home_buttons"
         android:drawableEnd="@drawable/b_arrow_right"
         android:gravity="start|center_vertical"
-        android:paddingLeft="20dp"
-        android:text="Make event"
-        android:textSize="40dp" />
+        android:paddingLeft="40dp"
+        android:text="Make Events"
+        android:textSize="35dp" />
 
 </RelativeLayout>
