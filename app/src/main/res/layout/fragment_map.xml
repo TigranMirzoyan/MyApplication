@@ -36,7 +36,7 @@
     <LinearLayout
         android:id="@+id/linear1"
         android:layout_width="70dp"
-        android:layout_height="150dp"
+        android:layout_height="80dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="5dp"
@@ -46,7 +46,6 @@
             android:id="@+id/button2"
             android:layout_width="65dp"
             android:layout_height="65dp"
-            android:layout_marginTop="15dp"
             android:background="@drawable/makem"
             android:text="+"
             android:textSize="50dp"
