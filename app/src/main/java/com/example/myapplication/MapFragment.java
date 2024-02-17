@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
@@ -12,8 +14,11 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -22,6 +27,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import androidx.core.content.ContextCompat;
+
 
 import androidx.appcompat.widget.SearchView;
 
@@ -33,11 +40,16 @@ import java.util.List;
 public class MapFragment extends Fragment {
 
     private GoogleMap googleMap;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
     private SearchView searchView;
     private int buttonVisBool = 0;
 
 
     Marker clickedMarker = null;
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -47,6 +59,8 @@ public class MapFragment extends Fragment {
 
         // инициализировать View
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         // инициализировать SearchView
         searchView = view.findViewById(R.id.searchView);
@@ -93,6 +107,20 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapReady(@NonNull GoogleMap map) {
                 googleMap = map;
+
+
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted, request it
+                    ActivityCompat.requestPermissions(requireActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            LOCATION_PERMISSION_REQUEST_CODE);
+                } else {
+                    // Permission is granted, enable the My Location button
+                    googleMap.setMyLocationEnabled(true);
+                }
+
+                googleMap.setMyLocationEnabled(true);
 
                 Button deleteButton = view.findViewById(R.id.button1);
                 Button addButton = view.findViewById(R.id.button2);
@@ -144,6 +172,22 @@ public class MapFragment extends Fragment {
 
         });
 
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(requireActivity(), location -> {
+                        if (location != null) {
+                            LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            if (googleMap != null) {
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+                            }
+                        }
+                    });
+        } else {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
         return view;
     }
 
