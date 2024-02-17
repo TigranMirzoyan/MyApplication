@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/searchview"
+        android:background="@drawable/home_buttons"
         android:drawableStart="@drawable/b_arrow_left"
         android:gravity="end|center_vertical"
         android:paddingLeft="10dp"
@@ -99,7 +99,7 @@
         android:layout_marginRight="40dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="40dp"
-        android:background="@drawable/searchview"
+        android:background="@drawable/home_buttons"
         android:text="Save"
         android:textSize="20dp" />
 
