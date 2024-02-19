@@ -5,6 +5,8 @@
     <color name="green">#05a761</color>
     <color name="green2">#68c398</color>
     <color name="bluetheendcolour">#0050AF</color>
+    <color name="bluebuttons">#367FD7</color>
+    <color name="yellow">#FF9C00</color>
     <color name="red">#ef1d26</color>
     <color name="better_white">#f6f6f6</color>
 </resources>

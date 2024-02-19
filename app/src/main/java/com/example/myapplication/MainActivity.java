@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -16,6 +17,12 @@ import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
     SmoothBottomBar smoothBottomBar;
+    final Fragment homeFragment = new HomeFragment();
+    final Fragment profileFragment = new ProfileFragment();
+    final Fragment mapFragment = new MapFragment();
+    final Fragment messengerFragment = new MessengerFragment();
+    final FragmentManager fragmentManager = getSupportFragmentManager();
+    Fragment activeFragment = homeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,48 +32,36 @@ public class MainActivity extends AppCompatActivity {
         smoothBottomBar = findViewById(R.id.bottombar);
 
         // Отображаем HomeFragment при запуске приложения
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.framelayout, new HomeFragment());
-        fragmentTransaction.commit();
+        fragmentManager.beginTransaction().add(R.id.framelayout, homeFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.framelayout, profileFragment).hide(profileFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.framelayout, mapFragment).hide(mapFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.framelayout, messengerFragment).hide(messengerFragment).commit();
 
         // менять фрагменты
         smoothBottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public boolean onItemSelect(int i) {
-
-                // home
-                if (i == 0) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.framelayout, new HomeFragment());
-                    fragmentTransaction.commit();
+                Fragment selectedFragment = null;
+                String tag = null;
+                switch (i) {
+                    case 0:
+                        selectedFragment = homeFragment;
+                        break;
+                    case 1:
+                        selectedFragment = profileFragment;
+                        break;
+                    case 2:
+                        selectedFragment = mapFragment;
+                        break;
+                    case 3:
+                        selectedFragment = messengerFragment;
+                        break;
                 }
 
-                // profile
-                if (i == 1) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.framelayout, new ProfileFragment());
-                    fragmentTransaction.commit();
-                }
+                fragmentManager.beginTransaction().hide(activeFragment).show(selectedFragment).commit();
+                activeFragment = selectedFragment;
 
-                // map
-                if (i == 2) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.framelayout, new MapFragment());
-                    fragmentTransaction.commit();
-                }
-
-                // messenger
-                if (i == 3) {
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.framelayout, new MessengerFragment());
-                    fragmentTransaction.commit();
-                }
-                return false;
+                return true;
             }
         });
     }
