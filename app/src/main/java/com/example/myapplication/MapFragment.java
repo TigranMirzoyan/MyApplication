@@ -97,6 +97,9 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapReady(@NonNull GoogleMap map) {
                 googleMap = map;
+                Button deleteButton = view.findViewById(R.id.button1);
+                Button addButton = view.findViewById(R.id.button2);
+                deleteButton.setVisibility(View.INVISIBLE);
 
 
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -109,12 +112,7 @@ public class MapFragment extends Fragment {
                     // Permission is granted, enable the My Location button
                     googleMap.setMyLocationEnabled(true);
                 }
-
                 googleMap.setMyLocationEnabled(true);
-
-                Button deleteButton = view.findViewById(R.id.button1);
-                Button addButton = view.findViewById(R.id.button2);
-                deleteButton.setVisibility(View.INVISIBLE);
 
                 googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
