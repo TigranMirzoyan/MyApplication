@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,31 +28,32 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+
 import androidx.core.content.ContextCompat;
 
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.gms.common.api.Status;
 
 import androidx.appcompat.widget.SearchView;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MapFragment extends Fragment {
-
     private GoogleMap googleMap;
-
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private SearchView searchView;
     private int buttonVisBool = 0;
-
-
+    private AutocompleteSupportFragment autocompleteFragment;
     Marker clickedMarker = null;
-
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
-
-
-
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,46 +64,34 @@ public class MapFragment extends Fragment {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        // инициализировать SearchView
-        searchView = view.findViewById(R.id.searchView);
-
         // инициализировать фрагмент карты
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         // async map (выполнение задачи без ожидания завершения других задач. Это позволяет программе выполнять другие операции, не блокируя выполнение)
 
+        autocompleteFragment = (AutocompleteSupportFragment)
+                getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+        if (!Places.isInitialized()) {
+            Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ");
+        }
+
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                String location = searchView.getQuery().toString();
-                List<Address> addressList = null;
-
-                if (location != null && !location.equals("")) {
-                    Geocoder geocoder = new Geocoder(requireContext());
-
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (addressList != null && !addressList.isEmpty()) {
-                        Address address = addressList.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                    } else {
-                    }
+            public void onPlaceSelected(@NonNull Place place) {
+                LatLng latLng = place.getLatLng();
+                if (latLng != null) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 }
-                return false;
             }
 
-
             @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public void onError(@NonNull Status status) {
+                Log.i("MapFragment", "An error occurred: " + status);
             }
         });
-
 
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
