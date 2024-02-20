@@ -73,6 +73,7 @@ public class MapFragment extends Fragment {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 }
             }
+
             @Override
             public void onError(@NonNull Status status) {
                 Log.i("MapFragment", " " + status);
@@ -104,7 +105,8 @@ public class MapFragment extends Fragment {
 
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     mMap.setMyLocationEnabled(true);
-                } else {}
+                } else {
+                }
 
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
