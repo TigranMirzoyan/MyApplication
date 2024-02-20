@@ -24,6 +24,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -58,12 +59,11 @@ public class MapFragment extends Fragment {
         autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         if (!Places.isInitialized()) {
             Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ");
         }
-
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -73,7 +73,6 @@ public class MapFragment extends Fragment {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 }
             }
-
             @Override
             public void onError(@NonNull Status status) {
                 Log.i("MapFragment", " " + status);
@@ -89,11 +88,23 @@ public class MapFragment extends Fragment {
                 deleteButton.setVisibility(View.INVISIBLE);
                 View view = getView();
 
+                if (view != null &&
+                        view.findViewById(Integer.parseInt("1")) != null) {
+                    View locationCompass = ((View) view.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("5"));
+                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationCompass.getLayoutParams();
+
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+
+                    layoutParams.setMargins(30, 0, 0, 100);
+                    locationCompass.setLayoutParams(layoutParams);
+                }
 
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     mMap.setMyLocationEnabled(true);
-                } else {
-                }
+                } else {}
 
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
