@@ -110,6 +110,17 @@ public class MapFragment extends Fragment {
                 Button addButton = view.findViewById(R.id.button2);
                 deleteButton.setVisibility(View.INVISIBLE);
 
+                mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                    @Override
+                    public void onCameraMoveStarted(int reason) {
+                        // If the camera starts moving for any reason, hide the delete button
+                        if (clickedMarker != null) {
+                            deleteButton.setVisibility(View.INVISIBLE);
+                            clickedMarker = null; // Optional: Reset the clicked marker if desired
+                        }
+                    }
+                });
+
                 // находим компас на карте и перенастраиваем его положение
                 View view = getView();
                 if (view != null && view.findViewById(Integer.parseInt("1")) != null) {
