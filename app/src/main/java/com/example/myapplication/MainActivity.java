@@ -53,9 +53,11 @@ public class MainActivity extends AppCompatActivity {
                     case 2:
                         selectedFragment = mapFragment;
                         break;
+                        /*
                     case 3:
                         selectedFragment = messengerFragment;
                         break;
+                         */
                 }
 
                 fragmentManager.beginTransaction().hide(activeFragment).show(selectedFragment).commit();

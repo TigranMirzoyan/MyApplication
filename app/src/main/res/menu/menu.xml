@@ -21,10 +21,11 @@
         android:icon="@drawable/a_map"
         />
 
+    <!--
     <item
         android:id="@+id/my_messenger"
         android:title=""
         android:icon="@drawable/a_messenger"
-        />
+        /> -->
 
 </menu>
