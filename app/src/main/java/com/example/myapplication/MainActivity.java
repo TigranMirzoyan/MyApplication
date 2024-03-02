@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -67,4 +68,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void setActiveFragment(Fragment fragment) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (!fragment.isAdded()) { // Check if the new fragment is already added
+            transaction.add(R.id.framelayout, fragment);
+        }
+        transaction.hide(activeFragment); // Hide the currently active fragment
+        transaction.show(fragment); // Show the new fragment
+        transaction.commit(); // Commit the transaction
+
+        activeFragment = fragment; // Update the active fragment reference
+    }
+
+    public void showHomeFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.hide(activeFragment);
+        if (!homeFragment.isAdded()) {
+            transaction.add(R.id.framelayout, homeFragment);
+        }
+        transaction.show(homeFragment);
+        transaction.commit();
+
+        activeFragment = homeFragment;
+    }
+
 }
