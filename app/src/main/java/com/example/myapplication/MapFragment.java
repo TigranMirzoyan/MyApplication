@@ -1,18 +1,24 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
@@ -47,6 +53,7 @@ public class MapFragment extends Fragment {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100; // Код запроса разрешения на местоположение
     private boolean isUserLocationVisible = false; // Показывается ли местоположение пользователя на карте
     private Button deleteButton; // Кнопка удаления маркера
+    ImageButton imageButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -136,26 +143,36 @@ public class MapFragment extends Fragment {
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
-                        clickedMarker = marker;
-                        if (clickedMarker != null) {
-                            moveDeleteButtonOverMarker(clickedMarker);
-                            deleteButton.setVisibility(View.VISIBLE);
-                        } else {
+                        if (clickedMarker != null && clickedMarker.equals(marker)) {
+                            // Double-clicked on the same marker, hide the delete button
+                            clickedMarker = null;
                             deleteButton.setVisibility(View.INVISIBLE);
-                        }
-
-                        if ("custom".equals(marker.getTag())) {
-                            // It's a custom marker, so do not show the delete button.
-                            deleteButton.setVisibility(View.INVISIBLE);
+                            return true; // Indicate that we have handled the event
                         } else {
-                            // It's not a custom marker, handle as before.
                             clickedMarker = marker;
-                            moveDeleteButtonOverMarker(clickedMarker);
-                            deleteButton.setVisibility(View.VISIBLE);
+                            if ("custom".equals(marker.getTag())) {
+                                // If it's a custom marker, hide the delete button and show custom dialog
+                                deleteButton.setVisibility(View.INVISIBLE);
+                                String dialogTitle = "Սուրբ Սարգիս մայր եկեղեցի";
+                                String dialogMessage = "Երևանի Էրեբունիի բերդը կաթողիկոսական համալիր էր: Սա պարիսպներով շրջապատված " +
+                                        "մի գեղեցկության համար, պարուհիներից բարձրաբար սպառված, Սուրբ Սարգիս, Սուրբ Գևորգ և Սուրբ" +
+                                        "Հակոբ եկեղեցիներով։ Այն մեկ մեծ համալիր էր, որում բաղկացած էին նորահայկական աշխարհային նշանակություններ։ " +
+                                        "Երևանի Էրեբունիներին մի մասնագիտական հուսալիություն կարող է լուծել այնքան, որ անցած ավելի քան ուղղակի էր" +
+                                        " հանդերձ իրենց եկեղեցական գաղափարները։ Երբեմնական կաթողիկոսական պատերազմի ընթացքում, Էրեբունին արգելվել " +
+                                        "էր տարածքը, սակայն Սարգիսի եկեղեցին մնաց դարձնելու գլխավոր կենտրոնը: Հանդիպել է դրան եկեղեցական ներողությունը, " +
+                                        "առաջնորդագետների բնապահպանության իմաստով, որոնց միջև բարձրացվեցին դիրքերը երեխաների ու առաջնորդարանական դպրոցները։";
+                                CustomDialogFragment dialogFragment = new CustomDialogFragment(dialogTitle, dialogMessage);
+                                dialogFragment.show(getChildFragmentManager(), "CustomDialogFragment");
+                            } else {
+                                // If it's not a custom marker, show delete button and handle accordingly
+                                moveDeleteButtonOverMarker(clickedMarker);
+                                deleteButton.setVisibility(View.VISIBLE);
+                            }
+                            return true; // Indicate that we have handled the event
                         }
-                        return true; // Indicate that we have handled the event
                     }
                 });
+
 
                 addButton.setOnClickListener(v -> addMarkerOnMapClick());
                 deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -274,5 +291,4 @@ public class MapFragment extends Fragment {
         drawable.draw(canvas);
         return bitmap;
     }
-
 }
