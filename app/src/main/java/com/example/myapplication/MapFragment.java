@@ -33,46 +33,50 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import java.util.Arrays;
 
 public class MapFragment extends Fragment {
-    private GoogleMap mMap;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private AutocompleteSupportFragment autocompleteFragment;
-    private Marker clickedMarker = null;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
-    private boolean isUserLocationVisible = false;
+    private GoogleMap mMap; // Карта Google
+    private FusedLocationProviderClient fusedLocationProviderClient; // Поставщик местоположения
+    private AutocompleteSupportFragment autocompleteFragment; // Фрагмент автозаполнения для мест
+    private Marker clickedMarker = null; // Выбранный маркер
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100; // Код запроса разрешения на местоположение
+    private boolean isUserLocationVisible = false; // Показывается ли местоположение пользователя на карте
+    private Button deleteButton; // Кнопка удаления маркера
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity()); // Получение поставщика местоположения
+
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map); // Получение фрагмента карты
+
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment); // Получение фрагмента автозаполнения
+
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)); // Установка полей места для автозаполнения
+
+        deleteButton = view.findViewById(R.id.button1);
+        deleteButton.setVisibility(View.INVISIBLE); // Скрытие кнопки удаления
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 LatLng latLng = place.getLatLng();
                 if (latLng != null) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15)); // Анимированное перемещение к выбранному месту
                 }
             }
 
             @Override
             public void onError(@NonNull Status status) {
-                // Handle errors when a place is selected
             }
         });
 
-        checkLocationPermission();
+        checkLocationPermission(); // Проверка разрешения на местоположение
 
-        // Когда карта готова, инициализируем её и настраиваем UI элементы
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
                 mMap = googleMap;
-                Button deleteButton = view.findViewById(R.id.button1);
                 Button addButton = view.findViewById(R.id.button2);
-                deleteButton.setVisibility(View.INVISIBLE);
 
                 mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
                     @Override
@@ -85,27 +89,27 @@ public class MapFragment extends Fragment {
                 });
 
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mMap.setMyLocationEnabled(true);
+                    mMap.setMyLocationEnabled(true); // Включение отображения местоположения пользователя на карте
                 }
 
-                View compass = getView().findViewById(Integer.parseInt("1"));
+                View compass = getView().findViewById(Integer.parseInt("1")); // Компас на карте
                 if (compass != null) {
-                    View locationCompass = ((View) compass.getParent()).findViewById(Integer.parseInt("5"));
+                    View locationCompass = ((View) compass.getParent()).findViewById(Integer.parseInt("5")); // Компас местоположения на карте
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationCompass.getLayoutParams();
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-                    layoutParams.setMargins(30, 0, 0, 100);
+                    layoutParams.setMargins(30, 0, 0, 100); // Установка отступов для компаса местоположения
                     locationCompass.setLayoutParams(layoutParams);
                 }
 
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                mMap.getUiSettings().setMyLocationButtonEnabled(false); // Отключение кнопки местоположения на карте
 
                 if (view != null) {
                     view.findViewById(R.id.MyLocationbtn).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            moveToCurrentLocation();
+                            moveToCurrentLocation(); // Перемещение на текущее местоположение пользователя
                         }
                     });
                 }
@@ -113,38 +117,37 @@ public class MapFragment extends Fragment {
                 mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
                     @Override
                     public void onCameraMove() {
-                        checkIfUserLocationVisibleAndUpdateButton();
+                        checkIfUserLocationVisibleAndUpdateButton(); // Проверка видимости местоположения пользователя и обновление кнопки
+                        moveDeleteButtonOverMarker(clickedMarker); // Перемещение кнопки удаления над маркером
                     }
                 });
 
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                mMap.setOnMarkerClickListener(marker -> {
+                    clickedMarker = marker;
+                    if (clickedMarker != null) {
+                        moveDeleteButtonOverMarker(clickedMarker);
+                        deleteButton.setVisibility(View.VISIBLE);
+                    } else {
+                        deleteButton.setVisibility(View.INVISIBLE);
+                    }
+                    return true;
+                });
+
+                deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        if (clickedMarker == null || !clickedMarker.equals(marker)) {
-                            deleteButton.setVisibility(View.VISIBLE);
-                            Point markerPoint = mMap.getProjection().toScreenLocation(marker.getPosition());
-                            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) deleteButton.getLayoutParams();
-                            layoutParams.leftMargin = markerPoint.x - (deleteButton.getWidth() / 2);
-                            layoutParams.topMargin = markerPoint.y - deleteButton.getHeight() - 95;
-                            deleteButton.setLayoutParams(layoutParams);
-                            clickedMarker = marker;
-                        } else {
-                            deleteButton.setVisibility(View.INVISIBLE);
+                    public void onClick(View v) {
+                        if (clickedMarker != null) {
+                            clickedMarker.remove();
                             clickedMarker = null;
+                            deleteButton.setVisibility(View.INVISIBLE);
                         }
-                        return true;
                     }
                 });
 
-
-                // Обработчик нажатия на кнопку удаления маркера
-                deleteButton.setOnClickListener(v -> deleteSelectedMarker(deleteButton));
-
-                // Назначение обработчика нажатия на кнопку добавления маркера
                 addButton.setOnClickListener(v -> addMarkerOnMapClick());
             }
         });
-        return view; // Возвращаем view для отображения фрагмента
+        return view;
     }
 
     private void addMarkerOnMapClick() {
@@ -152,7 +155,7 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapClick(LatLng latLng) {
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(latLng.latitude + ":" + latLng.longitude);
-                mMap.addMarker(markerOptions);
+                mMap.addMarker(markerOptions); // Добавление маркера при клике на карту
                 mMap.setOnMapClickListener(null);
             }
         });
@@ -166,7 +169,7 @@ public class MapFragment extends Fragment {
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
             if (location != null) {
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15)); // Анимированное перемещение на текущее местоположение пользователя
             }
         });
     }
@@ -180,10 +183,10 @@ public class MapFragment extends Fragment {
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
             if (location != null && mMap != null) {
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                isUserLocationVisible = mMap.getProjection().getVisibleRegion().latLngBounds.contains(currentLatLng);
+                isUserLocationVisible = mMap.getProjection().getVisibleRegion().latLngBounds.contains(currentLatLng); // Проверка видимости местоположения пользователя на карте
                 Button myLocationButton = getView().findViewById(R.id.MyLocationbtn);
                 if (isUserLocationVisible) {
-                    myLocationButton.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.my_location_visible));
+                    myLocationButton.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.my_location_visible)); // Обновление внешнего вида кнопки
                 } else {
                     myLocationButton.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.my_location_not_visible));
                 }
@@ -198,7 +201,7 @@ public class MapFragment extends Fragment {
             requestLocationPermission();
         }
         if (!Places.isInitialized()) {
-            Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ");
+            Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ"); // Инициализация Places API
         }
     }
 
@@ -211,7 +214,7 @@ public class MapFragment extends Fragment {
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
             if (location != null && mMap != null) {
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15)); // Перемещение камеры к последнему известному местоположению пользователя
             }
         });
     }
@@ -219,14 +222,18 @@ public class MapFragment extends Fragment {
     private void requestLocationPermission() {
         ActivityCompat.requestPermissions(requireActivity(),
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                LOCATION_PERMISSION_REQUEST_CODE);
+                LOCATION_PERMISSION_REQUEST_CODE); // Запрос разрешения на местоположение
     }
 
-    private void deleteSelectedMarker(Button deleteButton) {
-        if (clickedMarker != null) {
-            clickedMarker.remove();
-            deleteButton.setVisibility(View.INVISIBLE);
-            clickedMarker = null;
+    private void moveDeleteButtonOverMarker(Marker marker) {
+        if (marker != null && mMap != null) {
+            Point markerScreenPoint = mMap.getProjection().toScreenLocation(marker.getPosition());
+
+            int translationX = markerScreenPoint.x - (deleteButton.getWidth() / 2);
+            int translationY = markerScreenPoint.y - deleteButton.getHeight() - getResources().getDimensionPixelSize(R.dimen.marker_padding);
+
+            deleteButton.setTranslationX(translationX);
+            deleteButton.setTranslationY(translationY);
         }
     }
 }
