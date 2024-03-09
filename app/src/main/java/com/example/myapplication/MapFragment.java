@@ -151,6 +151,7 @@ public class MapFragment extends Fragment {
                         } else {
                             clickedMarker = marker;
                             if ("custom".equals(marker.getTag())) {
+
                                 // If it's a custom marker, hide the delete button and show custom dialog
                                 deleteButton.setVisibility(View.INVISIBLE);
                                 String dialogTitle = "Սուրբ Սարգիս մայր եկեղեցի";
