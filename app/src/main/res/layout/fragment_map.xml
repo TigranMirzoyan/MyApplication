@@ -34,7 +34,6 @@
         android:layout_gravity="center"
         android:background="@drawable/deleteb"
         android:drawableTop="@drawable/a_delete"
-        android:gravity="center_horizontal"
         android:paddingTop="12dp" />
 
     <LinearLayout
