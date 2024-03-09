@@ -1,8 +1,13 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +18,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.api.Status;
@@ -22,6 +28,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -71,6 +78,10 @@ public class MapFragment extends Fragment {
         });
 
         checkLocationPermission(); // Проверка разрешения на местоположение
+
+        if (!Places.isInitialized()) {
+            Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ"); // Инициализация Places API
+        }
 
         supportMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -122,17 +133,31 @@ public class MapFragment extends Fragment {
                     }
                 });
 
-                mMap.setOnMarkerClickListener(marker -> {
-                    clickedMarker = marker;
-                    if (clickedMarker != null) {
-                        moveDeleteButtonOverMarker(clickedMarker);
-                        deleteButton.setVisibility(View.VISIBLE);
-                    } else {
-                        deleteButton.setVisibility(View.INVISIBLE);
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        clickedMarker = marker;
+                        if (clickedMarker != null) {
+                            moveDeleteButtonOverMarker(clickedMarker);
+                            deleteButton.setVisibility(View.VISIBLE);
+                        } else {
+                            deleteButton.setVisibility(View.INVISIBLE);
+                        }
+
+                        if ("custom".equals(marker.getTag())) {
+                            // It's a custom marker, so do not show the delete button.
+                            deleteButton.setVisibility(View.INVISIBLE);
+                        } else {
+                            // It's not a custom marker, handle as before.
+                            clickedMarker = marker;
+                            moveDeleteButtonOverMarker(clickedMarker);
+                            deleteButton.setVisibility(View.VISIBLE);
+                        }
+                        return true; // Indicate that we have handled the event
                     }
-                    return true;
                 });
 
+                addButton.setOnClickListener(v -> addMarkerOnMapClick());
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -144,7 +169,10 @@ public class MapFragment extends Fragment {
                     }
                 });
 
-                addButton.setOnClickListener(v -> addMarkerOnMapClick());
+                Marker customMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(40.177114, 44.502224))
+                        .icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.church_marker))));
+                customMarker.setTag("custom");
             }
         });
         return view;
@@ -200,9 +228,6 @@ public class MapFragment extends Fragment {
         } else {
             requestLocationPermission();
         }
-        if (!Places.isInitialized()) {
-            Places.initialize(requireActivity().getApplicationContext(), "AIzaSyCCmIaUzr43cDsJmXee0li1d1aoq9SffKQ"); // Инициализация Places API
-        }
     }
 
     private void getLastKnownLocation() {
@@ -236,4 +261,18 @@ public class MapFragment extends Fragment {
             deleteButton.setTranslationY(translationY);
         }
     }
+
+    public static Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            drawable = (DrawableCompat.wrap(drawable)).mutate();
+        }
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
 }
