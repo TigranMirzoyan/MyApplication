@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
-import com.example.myapplication.R; // Assuming your resources are in the R class of your application package
-
 public class CustomDialogFragment extends DialogFragment {
 
     private String title;
