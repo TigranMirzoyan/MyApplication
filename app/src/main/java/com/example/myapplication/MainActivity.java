@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemSelect(int i) {
                 Fragment selectedFragment = null;
-                String tag = null;
                 switch (i) {
                     case 0:
                         selectedFragment = homeFragment;
