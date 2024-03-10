@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="custom_marker_tags">
+        <item>custom1</item>
+        <item>custom2</item>
+        <!-- Add more custom marker tags as needed -->
+    </string-array>
+
+    <string-array name="custom_marker_titles">
+        <item>The St. Sarkis Church</item>
+        <item>second</item>
+        <!-- Add titles for custom markers -->
+    </string-array>
+
+    <string-array name="custom_marker_descriptions">
+        <item>
+            The St. Sarkis Church, once the seat of the Patriarch, along with the monastery, served as the patriarchal inn for guests. However, both were destroyed in the 1679 earthquake. The church was reconstructed during the tenure of His Holiness Edesatsi Nahabet Catholicos (1691-1705) on the same site. Later, from 1835 to 1842, it was rebuilt again.\n
+            \n
+            Initially lacking aesthetic appeal compared to other Old City churches, it underwent significant renovations during the reign of His Holiness Vazken I Catholicos. Architect Rafayel Israelian\'s 1972 plan preserved the original character during reconstruction, covering the fuh-sahd with Ani orange tufa rocks and triangular niches. Architect Ardzroun Galikian continued the work after Israelian\'s death.\n
+            \n
+            From 1971 to 1976, interior enhancements included adding a gallery for the church choir and replacing the dome and drum with a taller dome and polyhedral fan-shaped spire. The bell tower was completed in 2000.\n
+            \n
+            Sarkis Kurkjian and his London-based children generously funded the church\'s rebuilding.
+        </item>
+        <item>Description of custom marker 2</item>
+        <!-- Add descriptions for custom markers -->
+    </string-array>
+</resources>

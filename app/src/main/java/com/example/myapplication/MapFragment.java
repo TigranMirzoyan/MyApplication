@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -150,21 +151,29 @@ public class MapFragment extends Fragment {
                             return true; // Indicate that we have handled the event
                         } else {
                             clickedMarker = marker;
-                            if ("custom".equals(marker.getTag())) {
+                            if (marker.getTag() != null && marker.getTag() instanceof String) {
+                                String clickedTag = (String) marker.getTag();
+                                Resources res = getResources();
+                                String[] markerTags = res.getStringArray(R.array.custom_marker_tags);
+                                String[] markerTitles = res.getStringArray(R.array.custom_marker_titles);
+                                String[] markerDescriptions = res.getStringArray(R.array.custom_marker_descriptions);
 
-                                // If it's a custom marker, hide the delete button and show custom dialog
-                                deleteButton.setVisibility(View.INVISIBLE);
-                                String dialogTitle = "Սուրբ Սարգիս մայր եկեղեցի";
-                                String dialogMessage = "Երևանի Էրեբունիի բերդը կաթողիկոսական համալիր էր: Սա պարիսպներով շրջապատված " +
-                                        "մի գեղեցկության համար, պարուհիներից բարձրաբար սպառված, Սուրբ Սարգիս, Սուրբ Գևորգ և Սուրբ" +
-                                        "Հակոբ եկեղեցիներով։ Այն մեկ մեծ համալիր էր, որում բաղկացած էին նորահայկական աշխարհային նշանակություններ։ " +
-                                        "Երևանի Էրեբունիներին մի մասնագիտական հուսալիություն կարող է լուծել այնքան, որ անցած ավելի քան ուղղակի էր" +
-                                        " հանդերձ իրենց եկեղեցական գաղափարները։ Երբեմնական կաթողիկոսական պատերազմի ընթացքում, Էրեբունին արգելվել " +
-                                        "էր տարածքը, սակայն Սարգիսի եկեղեցին մնաց դարձնելու գլխավոր կենտրոնը: Հանդիպել է դրան եկեղեցական ներողությունը, " +
-                                        "առաջնորդագետների բնապահպանության իմաստով, որոնց միջև բարձրացվեցին դիրքերը երեխաների ու առաջնորդարանական դպրոցները։";
-                                CustomDialogFragment dialogFragment = new CustomDialogFragment(dialogTitle, dialogMessage);
-                                dialogFragment.show(getChildFragmentManager(), "CustomDialogFragment");
-                            } else {
+                                for (int i = 0; i < markerTags.length; i++) {
+                                    if (clickedTag.equals(markerTags[i])) {
+                                        // Found the matching custom marker, get its title and description
+                                        String dialogTitle = markerTitles[i];
+                                        String dialogMessage = markerDescriptions[i];
+
+                                        // Show custom dialog with the title and description
+                                        CustomDialogFragment dialogFragment = new CustomDialogFragment(dialogTitle, dialogMessage);
+                                        dialogFragment.show(getChildFragmentManager(), "CustomDialogFragment");
+
+                                        // Hide the delete button for custom markers
+                                        deleteButton.setVisibility(View.INVISIBLE);
+                                        return true; // Indicate that we have handled the event
+                                    }
+                                }
+                            }else {
                                 // If it's not a custom marker, show delete button and handle accordingly
                                 moveDeleteButtonOverMarker(clickedMarker);
                                 deleteButton.setVisibility(View.VISIBLE);
@@ -190,7 +199,7 @@ public class MapFragment extends Fragment {
                 Marker customMarker = mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(40.177114, 44.502224))
                         .icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.church_marker))));
-                customMarker.setTag("custom");
+                customMarker.setTag("custom1");
             }
         });
         return view;
