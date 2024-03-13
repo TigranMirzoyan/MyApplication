@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import me.ibrahimsn.lib.OnItemSelectedListener;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
@@ -15,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     final Fragment profileFragment = new ProfileFragment();
     final Fragment mapFragment = new MapFragment();
     final FragmentManager fragmentManager = getSupportFragmentManager();
+    final Fragment loginFragment = new LogInFragment();
     Fragment activeFragment = homeFragment;
 
     @Override
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.framelayout, homeFragment).commit();
         fragmentManager.beginTransaction().add(R.id.framelayout, profileFragment).hide(profileFragment).commit();
         fragmentManager.beginTransaction().add(R.id.framelayout, mapFragment).hide(mapFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.framelayout, loginFragment).hide(loginFragment).commit();
 
         // менять фрагменты
         smoothBottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -39,7 +44,11 @@ public class MainActivity extends AppCompatActivity {
                         selectedFragment = homeFragment;
                         break;
                     case 1:
-                        selectedFragment = profileFragment;
+                        if (isUserLoggedIn()) {
+                            selectedFragment = profileFragment;
+                        } else {
+                            selectedFragment = loginFragment;
+                        }
                         break;
                     case 2:
                         selectedFragment = mapFragment;
@@ -76,5 +85,10 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
 
         activeFragment = homeFragment;
+    }
+
+    private boolean isUserLoggedIn() {
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.myapplication.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("isLoggedIn", false);
     }
 }
