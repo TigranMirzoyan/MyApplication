@@ -1,7 +1,5 @@
 package com.example.myapplication;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,16 +7,23 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import me.ibrahimsn.lib.OnItemSelectedListener;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
+    // UI component to display navigation items
     SmoothBottomBar smoothBottomBar;
+
+    // Declaring fragments for different sections of the app
     final Fragment homeFragment = new HomeFragment();
     final Fragment profileFragment = new ProfileFragment();
     final Fragment mapFragment = new MapFragment();
-    final FragmentManager fragmentManager = getSupportFragmentManager();
     final Fragment loginFragment = new LogInFragment();
+    final FragmentManager fragmentManager = getSupportFragmentManager();
+    private FirebaseAuth.AuthStateListener authStateListener;
     Fragment activeFragment = homeFragment;
 
     @Override
@@ -26,58 +31,91 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize the bottom navigation bar
         smoothBottomBar = findViewById(R.id.bottombar);
 
-        // Отображаем HomeFragment при запуске приложения
+        // Initial fragment setup: add all fragments, but only display HomeFragment
+        setupFragments();
+
+        // Firebase authentication initialization
+        setupFirebaseAuth();
+
+        // Bottom bar item selection handling
+        setupBottomBarItemSelection();
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.framelayout, new HomeFragment()) // Ensure this is your container ID
+                    .commit();
+        }
+    }
+
+    private void setupFragments() {
         fragmentManager.beginTransaction().add(R.id.framelayout, homeFragment).commit();
         fragmentManager.beginTransaction().add(R.id.framelayout, profileFragment).hide(profileFragment).commit();
         fragmentManager.beginTransaction().add(R.id.framelayout, mapFragment).hide(mapFragment).commit();
         fragmentManager.beginTransaction().add(R.id.framelayout, loginFragment).hide(loginFragment).commit();
+    }
 
-        // менять фрагменты
-        smoothBottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public boolean onItemSelect(int i) {
-                Fragment selectedFragment = null;
-                switch (i) {
-                    case 0:
-                        selectedFragment = homeFragment;
-                        break;
-                    case 1:
-                        if (isUserLoggedIn()) {
-                            selectedFragment = profileFragment;
-                        } else {
-                            selectedFragment = loginFragment;
-                        }
-                        break;
-                    case 2:
-                        selectedFragment = mapFragment;
-                        break;
-                }
-
-                fragmentManager.beginTransaction().hide(activeFragment).show(selectedFragment).commit();
-                activeFragment = selectedFragment;
-
-                return true;
+    private void setupFirebaseAuth() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        authStateListener = firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                // User is signed in, switch to profile fragment if necessary
+                setActiveFragment(profileFragment);
+            } else {
+                // User is signed out, switch to login fragment if necessary
+                setActiveFragment(loginFragment);
             }
+        };
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    private void setupBottomBarItemSelection() {
+        smoothBottomBar.setOnItemSelectedListener((OnItemSelectedListener) i -> {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            Fragment selectedFragment = null;
+            switch (i) {
+                case 0:
+                    selectedFragment = homeFragment;
+                    break;
+                case 1:
+                    selectedFragment = (currentUser != null) ? profileFragment : loginFragment;
+                    break;
+                case 2:
+                    selectedFragment = mapFragment;
+                    break;
+            }
+            if (selectedFragment != null) {
+                switchFragment(selectedFragment);
+            }
+            return true;
         });
     }
 
     public void setActiveFragment(Fragment fragment) {
+        fragmentManager.beginTransaction()
+                .hide(activeFragment)
+                .show(fragment)
+                .commit();
+        activeFragment = fragment;
+    }
+
+    public void switchFragment(Fragment fragment) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (!fragment.isAdded()) { // Check if the new fragment is already added
+        if (!fragment.isAdded()) {
             transaction.add(R.id.framelayout, fragment);
         }
-        transaction.hide(activeFragment); // Hide the currently active fragment
-        transaction.show(fragment); // Show the new fragment
-        transaction.commit(); // Commit the transaction
-
-        activeFragment = fragment; // Update the active fragment reference
+        transaction.hide(activeFragment)
+                .show(fragment)
+                .commit();
+        activeFragment = fragment;
     }
 
     public void showHomeFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.hide(activeFragment);
+        transaction.hide(activeFragment); // Assuming 'activeFragment' tracks the currently shown fragment
         if (!homeFragment.isAdded()) {
             transaction.add(R.id.framelayout, homeFragment);
         }
@@ -87,8 +125,12 @@ public class MainActivity extends AppCompatActivity {
         activeFragment = homeFragment;
     }
 
-    private boolean isUserLoggedIn() {
-        SharedPreferences sharedPreferences = getSharedPreferences("com.example.myapplication.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("isLoggedIn", false);
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (authStateListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        }
     }
 }

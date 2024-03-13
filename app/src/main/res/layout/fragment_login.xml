@@ -48,8 +48,14 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <Button
-        android:id="@+id/loginbutton"
+        android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_below="@id/TextInputLayout2"
@@ -57,20 +63,20 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/loginbutton"
         android:text="Login"
-        android:textSize="30dp"
-        android:textAllCaps="false"/>
+        android:textAllCaps="false"
+        android:textSize="30dp" />
 
     <Button
         android:id="@+id/registerbutton"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
         android:layout_below="@id/TextInputLayout2"
         android:layout_marginHorizontal="50dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/register_in_login_button"
         android:text="Register"
-        android:textSize="30dp"
-        android:textAllCaps="false"/>
+        android:textAllCaps="false"
+        android:textSize="15dp" />
 
 
 </LinearLayout>
