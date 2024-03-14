@@ -14,10 +14,7 @@ import me.ibrahimsn.lib.OnItemSelectedListener;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
-    // UI component to display navigation items
     SmoothBottomBar smoothBottomBar;
-
-    // Declaring fragments for different sections of the app
     final Fragment homeFragment = new HomeFragment();
     final Fragment profileFragment = new ProfileFragment();
     final Fragment mapFragment = new MapFragment();
@@ -107,9 +104,7 @@ public class MainActivity extends AppCompatActivity {
         if (!fragment.isAdded()) {
             transaction.add(R.id.framelayout, fragment);
         }
-        transaction.hide(activeFragment)
-                .show(fragment)
-                .commit();
+        transaction.hide(activeFragment).show(fragment).commit();
         activeFragment = fragment;
     }
 

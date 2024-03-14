@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,7 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterFragment extends Fragment {
     TextInputEditText editTextEmail, editTextPassword;
-    Button buttonReg,buttonLogin;
+    Button buttonReg, buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
 
@@ -43,24 +45,19 @@ public class RegisterFragment extends Fragment {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                saveState();
                 MainActivity activity = (MainActivity) getActivity();
-                if (activity != null) {
-                    // Correctly switch back to the LogInFragment
-                    Fragment logInFragment = new LogInFragment();
-                    activity.switchFragment(logInFragment);
-                }
+                Fragment logInFragment = new LogInFragment();
+                activity.switchFragment(logInFragment);
             }
         });
-
 
 
         buttonReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email, password;
-                progressBar.setVisibility(View.VISIBLE);
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
+                String email = String.valueOf(editTextEmail.getText());
+                String password = String.valueOf(editTextPassword.getText());
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getActivity(), "Please enter your email", Toast.LENGTH_SHORT).show();
@@ -90,6 +87,27 @@ public class RegisterFragment extends Fragment {
             }
         });
 
+        restoreState();
+
         return view;
     }
+
+    private void saveState() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("register_email", editTextEmail.getText().toString());
+        editor.putString("register_password", editTextPassword.getText().toString());
+        editor.apply();
+    }
+
+    private void restoreState() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String email = sharedPref.getString("register_email", "");
+        String password = sharedPref.getString("register_password", "");
+        if(editTextEmail != null && editTextPassword != null) {
+            editTextEmail.setText(email);
+            editTextPassword.setText(password);
+        }
+    }
+
 }
